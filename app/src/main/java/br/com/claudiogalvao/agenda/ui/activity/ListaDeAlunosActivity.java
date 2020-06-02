@@ -65,7 +65,15 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
         * clicar em algum item da lista. (Vide o método configuraListaDeAlunos)
         * */
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add("Remover");
+
+        /*
+        * Os nossos itens de menu estão configurados em arquivo estático XML. Para inserir ele na
+        * nossa Activity, é necessário fazer o processo de inflar esse arquivo estático, ou seja,
+        * é necessário converter de arquivo estático para uma view. Para isso, passamos como parâmetro
+        * como primeiro argumento o nosso arquivo estático de menu, e como segundo argumento
+        * é indicado onde quer inflar esse menu, pois a Activity possui diferentes menus de contexto.
+        * */
+        getMenuInflater().inflate(R.menu.activity_lista_de_alunos_menu, menu);
     }
 
     @Override
@@ -79,10 +87,13 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
         * para um MenuInfo do AdapterView, assim teremos acesso a mais informações do objeto que foi
         * clicado.
         * */
-        AdapterView.AdapterContextMenuInfo menuInfo =
-                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        Aluno alunoEscolhido = adapter.getItem(menuInfo.position);
-        remove(alunoEscolhido);
+        int itemId = item.getItemId();
+        if(itemId == R.id.activity_lista_de_alunos_menu_remover) {
+            AdapterView.AdapterContextMenuInfo menuInfo =
+                    (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            Aluno alunoEscolhido = adapter.getItem(menuInfo.position);
+            remove(alunoEscolhido);
+        }
         return super.onContextItemSelected(item);
     }
 

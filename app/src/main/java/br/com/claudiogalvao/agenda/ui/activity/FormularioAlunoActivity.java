@@ -2,11 +2,11 @@ package br.com.claudiogalvao.agenda.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import br.com.claudiogalvao.agenda.R;
@@ -31,9 +31,22 @@ public class FormularioAlunoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_formulario_aluno);
 
         inicializaCampos();
-        configuraBotaoSalvar();
         carregaAluno();
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_formulario_aluno_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if(itemId == R.id.activity_formulario_aluno_salvar) {
+            finalizaFormulario();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void carregaAluno() {
@@ -52,22 +65,6 @@ public class FormularioAlunoActivity extends AppCompatActivity {
         campoNome.setText(aluno.getNome());
         campoTelefone.setText(aluno.getTelefone());
         campoEmail.setText(aluno.getEmail());
-    }
-
-    private void configuraBotaoSalvar() {
-        /*
-         * OnClickListeners pedem a implementação de uma interface padrão do Java que é o
-         * View.OnClickListener, que nesse caso, foi feita uma implementação por meio do uso
-         * de classe anônima, mas também poderia ser criada uma classe própria para isso
-         * */
-        Button botaoSalvar = findViewById(R.id.activity_formulario_aluno_botao_salvar);
-
-        botaoSalvar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finalizaFormulario();
-            }
-        });
     }
 
     private void finalizaFormulario() {

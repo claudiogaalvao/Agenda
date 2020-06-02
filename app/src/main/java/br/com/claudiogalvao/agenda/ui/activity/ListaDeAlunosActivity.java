@@ -3,12 +3,17 @@ package br.com.claudiogalvao.agenda.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,6 +31,7 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
 
     public static final String TITULO_APPBAR = "Lista de alunos";
     private static AlunoDAO dao = new AlunoDAO();
+    private ArrayAdapter<Aluno> adapter;
 
 
     @Override
@@ -42,9 +48,42 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
         setTitle(TITULO_APPBAR);
 
         configuraFabNovoAluno();
+        configuraListaDeAlunos();
 
         dao.adiciona(new Aluno("Claudio Galvão", "999898546", "claudiogalvao@gmail.com"));
         dao.adiciona(new Aluno("Carina Jesus", "85467372", "carina@gmail.com"));
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        /*
+        * Para implementar algo semelhante com o clique com o botão direito nos sistemas operacionais
+        * a Activity possui o método onCreateContextMenu, que precisamos sobrescrever para adicionar
+        * quais opções queremos que o nosso menu tenha utilizando o parâmetro menu do metódo.
+        * Após isso, é necessário configurar em que momento esse menu será acionado, ou seja,
+        * a partir de qual evento o menu irá aparecer. Nesse caso, queremos que apareça quando
+        * clicar em algum item da lista. (Vide o método configuraListaDeAlunos)
+        * */
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add("Remover");
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        /*
+        * A Activity possui um listener para monitorar o clique em qualquer item de menu no contexto
+        * dela, que é o onContextItemSelected. Quando um item de um ContextMenu é clicado então,
+        * essa função é chamada. Mas no caso, onde temos uma ListView e queremos saber qual item
+        * foi clicado, o item do tipo MenuItem que vem como parâmetro não é suficiente para saber
+        * qual item da nossa ListView foi clicado, então precisamos converter o MenuInfo do MenuItem
+        * para um MenuInfo do AdapterView, assim teremos acesso a mais informações do objeto que foi
+        * clicado.
+        * */
+        AdapterView.AdapterContextMenuInfo menuInfo =
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        Aluno alunoEscolhido = adapter.getItem(menuInfo.position);
+        remove(alunoEscolhido);
+        return super.onContextItemSelected(item);
     }
 
     private void configuraFabNovoAluno() {
@@ -75,15 +114,36 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
          * temos os resources do Android que já tem implementações simples para serem usadas, para o caso
          * de exibição de somente um TextView por exemplo.
          * O ListView já não é tão utilizado hoje em dia como era no começo do Android
+         * configuraListaDeAlunos();
+         *
+         * Ao invés de configurar a todo momento o ListView, o mais indicado é utilizar os métodos
+         * do próprio adapter para atualizar os dados da lista
          * */
-        configuraListaDeAlunos();
+        atualiza();
+    }
+
+    private void atualiza() {
+        adapter.clear();
+        adapter.addAll(dao.getAlunos());
     }
 
     private void configuraListaDeAlunos() {
         ListView listaDeAlunos = findViewById(R.id.activity_lista_de_alunos_listview);
-        final List<Aluno> alunos = dao.getAlunos();
-        configuraAdapter(listaDeAlunos, alunos);
+        configuraAdapter(listaDeAlunos);
         configuraListenerDeCliquePorItem(listaDeAlunos);
+
+        /*
+        * Para dizer em que momento queremos que o menu seja acionado, basta passarmos para a função
+        * registerForContextMenu a View onde ocorrerá a ação de clique longo. Quando passamos como
+        * argumento uma ViewGroup, o método já está preparado para configurar cada item individualmente,
+        * então não é necessário se preocupar com isso.
+        * */
+        registerForContextMenu(listaDeAlunos);
+    }
+
+    private void remove(Aluno alunoEscolhido) {
+        dao.removeAlunoPeloId(alunoEscolhido.getId());
+        adapter.remove(alunoEscolhido);
     }
 
     private void configuraListenerDeCliquePorItem(ListView listaDeAlunos) {
@@ -113,10 +173,10 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
         * */
     }
 
-    private void configuraAdapter(ListView listaDeAlunos, List<Aluno> alunos) {
-        listaDeAlunos.setAdapter(new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1,
-                alunos));
+    private void configuraAdapter(ListView listaDeAlunos) {
+        adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1);
+        listaDeAlunos.setAdapter(adapter);
     }
 
     private void testeManipulacaoDeViewsDoLayout() {

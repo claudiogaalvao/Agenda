@@ -22,16 +22,24 @@ public class AlunoDAO {
     }
 
     public void edita(Aluno aluno) {
-        Aluno alunoEncontrado = buscaAlunoPeloId(aluno);
+        Aluno alunoEncontrado = buscaAlunoPeloId(aluno.getId());
         if(alunoEncontrado != null) {
             int posicaoDoAluno = alunos.indexOf(alunoEncontrado);
             alunos.set(posicaoDoAluno, aluno);
         }
     }
 
-    private Aluno buscaAlunoPeloId(Aluno aluno) {
+    public void removeAlunoPeloId(int id) {
+        Aluno alunoEncontrado = buscaAlunoPeloId(id);
+        if(alunoEncontrado != null) {
+            int posicaoDoAluno = alunos.indexOf(alunoEncontrado);
+            alunos.remove(posicaoDoAluno);
+        }
+    }
+
+    public Aluno buscaAlunoPeloId(int id) {
         for (Aluno a : alunos) {
-            if(a.getId() == aluno.getId()) {
+            if(a.getId() == id) {
                 return a;
             }
         }

@@ -44,9 +44,6 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
 
         configuraFabNovoAluno();
         configuraListaDeAlunos();
-
-        dao.adiciona(new Aluno("Claudio Galvão", "999898546", "claudiogalvao@gmail.com"));
-        dao.adiciona(new Aluno("Carina Jesus", "85467372", "carina@gmail.com"));
     }
 
     @Override

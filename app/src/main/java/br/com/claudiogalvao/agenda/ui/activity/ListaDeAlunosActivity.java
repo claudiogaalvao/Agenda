@@ -1,5 +1,8 @@
 package br.com.claudiogalvao.agenda.ui.activity;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -69,7 +72,7 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
+    public boolean onContextItemSelected(MenuItem item) {
         /*
         * A Activity possui um listener para monitorar o clique em qualquer item de menu no contexto
         * dela, que é o onContextItemSelected. Quando um item de um ContextMenu é clicado então,
@@ -81,12 +84,26 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
         * */
         int itemId = item.getItemId();
         if(itemId == R.id.activity_lista_de_alunos_menu_remover) {
-            AdapterView.AdapterContextMenuInfo menuInfo =
-                    (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            Aluno alunoEscolhido = adapter.getItem(menuInfo.position);
-            remove(alunoEscolhido);
+            confirmaRemocao(item);
         }
         return super.onContextItemSelected(item);
+    }
+
+    private void confirmaRemocao(final MenuItem item) {
+        new AlertDialog
+                .Builder(this)
+                .setTitle("Removendo aluno")
+                .setMessage("Tem certeza que deseja remover o aluno?")
+                .setPositiveButton("Remover", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AdapterView.AdapterContextMenuInfo menuInfo =
+                                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                        Aluno alunoEscolhido = adapter.getItem(menuInfo.position);
+                        remove(alunoEscolhido);
+                    }
+                })
+                .setNegativeButton("Cancelar", null).show();
     }
 
     private void configuraFabNovoAluno() {

@@ -1,8 +1,5 @@
 package br.com.claudiogalvao.agenda.ui.activity;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -10,9 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,6 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import br.com.claudiogalvao.agenda.R;
 import br.com.claudiogalvao.agenda.dao.AlunoDAO;
 import br.com.claudiogalvao.agenda.model.Aluno;
+import br.com.claudiogalvao.agenda.ui.ListaDeAlunosView;
 import br.com.claudiogalvao.agenda.ui.adapter.ListaDeAlunosAdapter;
 
 import static br.com.claudiogalvao.agenda.ui.activity.ConstantesActivities.CHAVE_ALUNO;
@@ -30,6 +26,7 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
     public static final String TITULO_APPBAR = "Lista de alunos";
     private static AlunoDAO dao = new AlunoDAO();
     private ListaDeAlunosAdapter adapter;
+    private ListaDeAlunosView listaDeAlunosView = new ListaDeAlunosView(this);
 
 
     @Override
@@ -84,26 +81,9 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
         * */
         int itemId = item.getItemId();
         if(itemId == R.id.activity_lista_de_alunos_menu_remover) {
-            confirmaRemocao(item);
+            listaDeAlunosView.confirmaRemocao(item);
         }
         return super.onContextItemSelected(item);
-    }
-
-    private void confirmaRemocao(final MenuItem item) {
-        new AlertDialog
-                .Builder(this)
-                .setTitle("Removendo aluno")
-                .setMessage("Tem certeza que deseja remover o aluno?")
-                .setPositiveButton("Remover", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        AdapterView.AdapterContextMenuInfo menuInfo =
-                                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                        Aluno alunoEscolhido = adapter.getItem(menuInfo.position);
-                        remove(alunoEscolhido);
-                    }
-                })
-                .setNegativeButton("Cancelar", null).show();
     }
 
     private void configuraFabNovoAluno() {
@@ -139,16 +119,12 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
          * Ao invés de configurar a todo momento o ListView, o mais indicado é utilizar os métodos
          * do próprio adapter para atualizar os dados da lista
          * */
-        atualiza();
-    }
-
-    private void atualiza() {
-        adapter.atualiza(dao.getAlunos());
+        listaDeAlunosView.atualiza();
     }
 
     private void configuraListaDeAlunos() {
         ListView listaDeAlunos = findViewById(R.id.activity_lista_de_alunos_listview);
-        configuraAdapter(listaDeAlunos);
+        listaDeAlunosView.configuraAdapter(listaDeAlunos);
         configuraListenerDeCliquePorItem(listaDeAlunos);
 
         /*
@@ -158,11 +134,6 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
         * então não é necessário se preocupar com isso.
         * */
         registerForContextMenu(listaDeAlunos);
-    }
-
-    private void remove(Aluno alunoEscolhido) {
-        dao.removeAlunoPeloId(alunoEscolhido.getId());
-        adapter.remove(alunoEscolhido);
     }
 
     private void configuraListenerDeCliquePorItem(ListView listaDeAlunos) {
@@ -192,29 +163,9 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
         * */
     }
 
-    private void configuraAdapter(ListView listaDeAlunos) {
-        /*
-        * Este modelo de implementação é muito útil quando queremos exibir na tela apenas
-        * um informação de cada item do Array, e o ArrayAdapter consegue lidar com isso
-        * sem a necessidade de fazer mais implementações, pois para cada item que é passado
-        * parra essa implementação, ele faz um toString capturando uma string do objeto.
-        * E quando passamos um layout personalizado para o ArrayAdapter, ele só aceita layouts
-        * com apenas um TextView, se houve mais componentes, o app quebra.
-        *
-        * adapter = new ArrayAdapter<>(this,
-        *        android.R.layout.simple_list_item_1);
-        *
-        * Mas quando temos a necessidade de exibir mais informações, é necessário criarmos
-        * uma implementação de Adapter personalizada, que pega nosso layout e seta os dados
-        * nos componentes esperados.
-        * */
-
-        adapter = new ListaDeAlunosAdapter(this);
-        listaDeAlunos.setAdapter(adapter);
-    }
-
+    /*
     private void testeManipulacaoDeViewsDoLayout() {
-        /*
+
         * Após indicar o layout que queremos utilizar na nossa Activity, podemos manipular suas views
         * atribuindo novos valores (os id's usados foram usados temporariamente para fins de testes
         * e foram removidos para uso de ListView)
@@ -226,18 +177,19 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
         * primeiroAluno.setText(alunos.get(0));
         * segundoAluno.setText(alunos.get(1));
         * terceiroAluno.setText(alunos.get(2));
-        * */
+        *
     }
 
     private void testeCriacaoDeView() {
-        /*
+
         * É possível criar view diretamente no código sem uso de resource layout (arquivos estáticos)
         * mas não é recomendado pelo fato de acabar passando muita responsabilidade para a Activity
-        * */
+        *
 
         TextView textView = new TextView(this);
         textView.setText("Hello World!");
         setContentView(textView);
 
     }
+     */
 }

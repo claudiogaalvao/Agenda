@@ -2,16 +2,12 @@ package br.com.claudiogalvao.agenda.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,11 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.List;
-
 import br.com.claudiogalvao.agenda.R;
 import br.com.claudiogalvao.agenda.dao.AlunoDAO;
 import br.com.claudiogalvao.agenda.model.Aluno;
+import br.com.claudiogalvao.agenda.ui.adapter.ListaDeAlunosAdapter;
 
 import static br.com.claudiogalvao.agenda.ui.activity.ConstantesActivities.CHAVE_ALUNO;
 
@@ -31,7 +26,7 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
 
     public static final String TITULO_APPBAR = "Lista de alunos";
     private static AlunoDAO dao = new AlunoDAO();
-    private ArrayAdapter<Aluno> adapter;
+    private ListaDeAlunosAdapter adapter;
 
 
     @Override
@@ -134,8 +129,7 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
     }
 
     private void atualiza() {
-        adapter.clear();
-        adapter.addAll(dao.getAlunos());
+        adapter.atualiza(dao.getAlunos());
     }
 
     private void configuraListaDeAlunos() {
@@ -185,8 +179,23 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
     }
 
     private void configuraAdapter(ListView listaDeAlunos) {
-        adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1);
+        /*
+        * Este modelo de implementação é muito útil quando queremos exibir na tela apenas
+        * um informação de cada item do Array, e o ArrayAdapter consegue lidar com isso
+        * sem a necessidade de fazer mais implementações, pois para cada item que é passado
+        * parra essa implementação, ele faz um toString capturando uma string do objeto.
+        * E quando passamos um layout personalizado para o ArrayAdapter, ele só aceita layouts
+        * com apenas um TextView, se houve mais componentes, o app quebra.
+        *
+        * adapter = new ArrayAdapter<>(this,
+        *        android.R.layout.simple_list_item_1);
+        *
+        * Mas quando temos a necessidade de exibir mais informações, é necessário criarmos
+        * uma implementação de Adapter personalizada, que pega nosso layout e seta os dados
+        * nos componentes esperados.
+        * */
+
+        adapter = new ListaDeAlunosAdapter(this);
         listaDeAlunos.setAdapter(adapter);
     }
 
